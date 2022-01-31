@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { Link, useMatch } from 'react-router-dom';
@@ -43,8 +44,18 @@ const Item = styled.li`
     position: relative;
 `;
 
+const Input = styled(motion.input)`
+    transform-origin:  right center;
+    position: absolute;
+    left: -150px;
+`;
+
 const Search = styled.span`
   color: white;
+  display: flex;
+  align-items: center;
+  position: relative;
+
   svg {
     height: 25px;
   }
@@ -73,9 +84,10 @@ const logoVariants = {
 
 
 function Header() {
+    const [isSearchActive, setisSearchActive] = useState(false);
     const isHome = useMatch("/");
     const isTv = useMatch("/tv");
-
+    const toggleSearch = () => setisSearchActive(prev => !prev);
     return (
         <Nav>
             <Col>
@@ -100,18 +112,28 @@ function Header() {
                 </Items>
             </Col>
             <Col>
-                <Search>
-                  <svg
+                <Search onClick={toggleSearch}>
+                  <motion.svg
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
+                    transition={{type: "linear"}}
+                    animate={{ x: isSearchActive ? -180  : 0 }}
                   >
                     <path
                       fillRule="evenodd"
                       d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
                       clipRule="evenodd"
                     ></path>
-                  </svg>
+                  </motion.svg>
+                  <Input
+
+                    placeholder="Search for movie or tv show"
+                    type="text"
+                    transition={{type: "linear"}}
+                    animate={{ scaleX: isSearchActive ? 1 : 0 }}
+                  />
+
                 </Search>
             </Col>
         </Nav>
