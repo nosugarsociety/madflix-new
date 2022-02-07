@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, useAnimation, useViewportScroll } from 'framer-motion';
 import { Link, useMatch } from 'react-router-dom';
 
-const Nav = styled.nav`
+const Nav = styled(motion.nav)`
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: fixed;
     width: 100%;
     top: 0;
-    background-color: black;
+
     font-size: 14px;
     padding: 20px 60px;
     color: white;
@@ -45,9 +45,16 @@ const Item = styled.li`
 `;
 
 const Input = styled(motion.input)`
-    transform-origin:  right center;
-    position: absolute;
-    left: -150px;
+  transform-origin: right center;
+  position: absolute;
+  right: 0px;
+  padding: 5px 10px;
+  padding-left: 40px;
+  z-index: -1;
+  color: white;
+  font-size: 16px;
+  background-color: transparent;
+  border: 1px solid ${(props) => props.theme.white.lighter};
 `;
 
 const Search = styled.span`
@@ -73,28 +80,42 @@ const Circle = styled(motion.span)`
   background-color: ${(props) => props.theme.red};
 `;
 
-const logoVariants = {
+const navVariants = {
     initial: {
-        fillOpacity: 0,
+      backgroundColor: "rgba(0, 0, 0, 0)"
     },
-    hover: {
-        fillOpacity: 1,
+    scroll: {
+      backgroundColor: "rgba(0, 0, 0, 1)"
     }
 };
-
 
 function Header() {
     const [isSearchActive, setisSearchActive] = useState(false);
     const isHome = useMatch("/");
     const isTv = useMatch("/tv");
     const toggleSearch = () => setisSearchActive(prev => !prev);
+
+    const { scrollY } = useViewportScroll();
+    const navToogleAnim = useAnimation();
+
+    useEffect(() => {
+      scrollY.onChange(() => {
+        if(scrollY.get() > 65) {
+          navToogleAnim.start("scroll");
+        } else {
+          navToogleAnim.start("initial");
+        }
+      });
+    }, [scrollY]);
+
     return (
-        <Nav>
+        <Nav
+          variants={navVariants}
+          animate={navToogleAnim}
+          initial="initial"
+        >
             <Col>
                  <Logo
-                    variants={logoVariants}
-                    initial="initial"
-                    whileHover="hover"
                     xmlns="http://www.w3.org/2000/svg"
                     width="1024"
                     height="276.742"
@@ -127,7 +148,6 @@ function Header() {
                     ></path>
                   </motion.svg>
                   <Input
-
                     placeholder="Search for movie or tv show"
                     type="text"
                     transition={{type: "linear"}}
